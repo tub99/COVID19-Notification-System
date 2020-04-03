@@ -27,7 +27,7 @@ function MongoWrapper() {
   this.db = null;
   this.init = cb => {
     const uri = Constants.MONGODB_URI;
-    const client = new MongoClient(uri, { useNewUrlParser: true });
+    const client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
     client.connect(err => {
       console.log("DB connected");
       this.db = client.db("covid_db");
