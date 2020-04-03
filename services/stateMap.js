@@ -48,12 +48,9 @@ function StateMap() {
       };
     });
   };
-
-  this.getDelta = () => {
-    const updateList = [];
-    for (let delta in this.deltaMap) {
-      const current = this.deltaMap[delta]["current"];
-      const prev = this.deltaMap[delta]["prev"];
+  this.findDelta = (stateWiseData, deltaList) => {
+    const updateDeltaList = [];
+    const getDeltaStateWise = (current, prev) => {
       let isConfirmed = current.confirmed - prev.confirmed;
       let isDead = current.deaths - prev.deaths;
       let isRecovered = current.recovered - prev.recovered;
@@ -61,21 +58,39 @@ function StateMap() {
       isConfirmed = isConfirmed < 0 ? 0 : isConfirmed;
       isDead = isDead < 0 ? 0 : isDead;
       isRecovered = isRecovered < 0 ? 0 : isRecovered;
-
-      if (delta === "Total" && !(isConfirmed || isDead || isRecovered))
-        return updateList;
+      const { state } = current;
+      if (state === "Total" && !(isConfirmed || isDead || isRecovered)) {
+        return null;
+      }
       if (isDead || isRecovered || isConfirmed) {
-        const updatedStateData = {
-          state: delta,
+        return {
+          isChanged: true,
+          ...current,
           isDead,
           isRecovered,
           isConfirmed
         };
-        updateList.push(updatedStateData);
+      } else {
+        return {
+          isChanged: false,
+          ...current,
+          isDead,
+          isRecovered,
+          isConfirmed
+        }
       }
-      this.deltaMap[delta]["prev"] = current;
+    };
+
+    const isAnyUpdate = getDeltaStateWise(stateWiseData[0], deltaList[0]);
+    if (isAnyUpdate) {
+      for(const [i, deltaState] of deltaList.entries()) {
+        const current = stateWiseData[i];
+        const prev = deltaState;
+        const delta = getDeltaStateWise(current, prev);
+        updateDeltaList.push(delta);
+      }
     }
-    return updateList;
+    return updateDeltaList;
   };
 }
 

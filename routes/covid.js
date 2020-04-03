@@ -2,7 +2,12 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 const StateMap = require("./../services/stateMap");
+const MongoWrapper = require("./../services/db");
 
+const getLastSevenDayData = (timeSeriesData) =>{
+  const len=timeSeriesData.length ;
+  return timeSeriesData.slice(len-7);
+}
 /* GET users listing. */
 router.get("/", function(req, res, next) {
   axios
@@ -10,9 +15,26 @@ router.get("/", function(req, res, next) {
     .then(function(response) {
       // handle success
       let stateList = response.data.statewise;
-      
+      const {cases_time_series} = response.data;
+      const timeAnalysis =  getLastSevenDayData(cases_time_series);
      const stateWiseData = StateMap.getStateList(stateList);
-      res.send(stateWiseData);
+     MongoWrapper.storeDelta(stateWiseData,
+      (err, data) => {
+        const response = { totalCases: stateWiseData, delta : {},timeAnalysis }
+        if (err) res.send(response);
+       
+        if (data){
+          const {isUpdateAt, deltaList} = data;
+          const filteredDeltaList = deltaList.filter(d => d.isChanged);
+          response.delta = {
+            isUpdateAt,
+            deltaList: filteredDeltaList
+          }
+          res.send(response);
+        } 
+        if(!err && !data) res.send(response);
+      });
+      
     })
     .catch(function(error) {
       // handle error
