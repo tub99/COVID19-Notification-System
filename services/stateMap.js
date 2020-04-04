@@ -36,18 +36,7 @@ function StateMap() {
     });
   };
 
-  this.getTodayData = stateData => {
-    return stateData.map(data => {
-      const { state, delta, lastupdatedtime } = data;
-      this.deltaMap[state]["current"] = delta;
-
-      return {
-        state,
-        ...delta,
-        lastupdatedtime
-      };
-    });
-  };
+ 
   this.findDelta = (stateWiseData, deltaList) => {
     const updateDeltaList = [];
     const getDeltaStateWise = (current, prev) => {
@@ -92,6 +81,20 @@ function StateMap() {
     }
     return updateDeltaList;
   };
+
+  this.getTodayData = (stateData)=>{
+    return stateData.map(s=>{
+      const {deltaconfirmed, deltadeaths, deltarecovered, state} = s;
+      return {
+        state,
+        confirmed: deltaconfirmed,
+        deaths: deltadeaths,
+        recovered: deltarecovered
+      };
+
+    })
+  }
+
 }
 
 module.exports = new StateMap();

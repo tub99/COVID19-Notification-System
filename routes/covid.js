@@ -15,11 +15,11 @@ router.get("/", function (req, res, next) {
     .then(function (response) {
       // handle success
       let stateList = response.data.statewise;
+      const todaysData = StateMap.getTodayData(stateList);
       const { cases_time_series } = response.data;
       const timeAnalysis = getLastSevenDayData(cases_time_series);
       const stateWiseData = StateMap.getStateList(stateList);
-      const apiResponse = { totalCases: stateWiseData, delta: {}, timeAnalysis };
-      console.log('Hello');
+      const apiResponse = { totalCases: stateWiseData, delta: {}, timeAnalysis, today: todaysData };
       res.send(apiResponse);
       //  MongoWrapper.storeDelta(stateWiseData,
       //   (err, data) => {
