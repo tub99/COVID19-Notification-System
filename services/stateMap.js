@@ -1,27 +1,27 @@
 function StateMap() {
   this.deltaMap = {};
 
-  const initMap = state => {
+  const initMap = (state) => {
     if (!this.deltaMap[state]) {
       this.deltaMap[state] = {
-        current: {}
+        current: {},
       };
     }
   };
-  this.getStateList = stateData => {
-    return stateData.map(data => {
+  this.getStateList = (stateData) => {
+    return stateData.map((data) => {
       const {
         state,
         confirmed,
         deaths,
         recovered,
         lastupdatedtime,
-        delta
+        delta,
       } = data;
       if (!this.deltaMap[state]) {
         this.deltaMap[state] = {
           current: {},
-          prev: {}
+          prev: {},
         };
         this.deltaMap[state]["prev"] = delta;
       }
@@ -31,14 +31,13 @@ function StateMap() {
         confirmed,
         deaths,
         recovered,
-        lastupdatedtime
+        lastupdatedtime,
       };
     });
   };
 
- 
-  this.findDelta = (stateWiseData, deltaList) => {
-    const updateDeltaList = [];
+  this.findDelta = (stateWiseData, deltaMap) => {
+    let updateDeltaMap = Object.assign({}, deltaMap);
     const getDeltaStateWise = (current, prev) => {
       let isConfirmed = current.confirmed - prev.confirmed;
       let isDead = current.deaths - prev.deaths;
@@ -57,7 +56,7 @@ function StateMap() {
           ...current,
           isDead,
           isRecovered,
-          isConfirmed
+          isConfirmed,
         };
       } else {
         return {
@@ -65,36 +64,71 @@ function StateMap() {
           ...current,
           isDead,
           isRecovered,
-          isConfirmed
-        }
+          isConfirmed,
+        };
       }
     };
 
-    const isAnyUpdate = getDeltaStateWise(stateWiseData[0], deltaList[0]);
+    const isAnyUpdate = getDeltaStateWise(stateWiseData[0], deltaMap["Total"]);
     if (isAnyUpdate) {
-      for(const [i, deltaState] of deltaList.entries()) {
+      for (const [i,stateData] of stateWiseData.entries()) {
+        const {state} = stateData;
         const current = stateWiseData[i];
-        const prev = deltaState;
+        const prev = deltaMap[state];
         const delta = getDeltaStateWise(current, prev);
-        updateDeltaList.push(delta);
+        updateDeltaMap[state] = delta;
+      }
+    } else {
+      //change all isChanged
+      for (const deltaKey in deltaMap) {
+        deltaMap[deltaKey]["isChanged"] = false;
       }
     }
-    return updateDeltaList;
+    return updateDeltaMap;
   };
 
-  this.getTodayData = (stateData)=>{
-    return stateData.map(s=>{
-      const {deltaconfirmed, deltadeaths, deltarecovered, state} = s;
+  this.getFilteredDeltaList = (deltaMap)=>{
+    const deltaList = [];
+    for (const deltaKey in deltaMap) {
+      if(deltaMap[deltaKey]["isChanged"]){
+        deltaList.push(deltaMap[deltaKey]);
+      }
+    }
+    return deltaList;
+  }
+
+  this.getTodayData = (stateData) => {
+    return stateData.map((s) => {
+      const { deltaconfirmed, deltadeaths, deltarecovered, state } = s;
       return {
         state,
         confirmed: deltaconfirmed,
         deaths: deltadeaths,
-        recovered: deltarecovered
+        recovered: deltarecovered,
       };
+    });
+  };
 
-    })
-  }
-
+  this.initDelta = (stateWiseData) => {
+    let stateMap = {};
+    stateWiseData.forEach((data) => {
+      const { state, confirmed, deaths, recovered, lastupdatedtime } = data;
+      if(!stateMap[state]){
+        stateMap[state] = {
+          state,
+          confirmed,
+          deaths,
+          recovered,
+          lastupdatedtime,
+          isDead: 0,
+          isRecovered: 0,
+          isConfirmed: 0,
+          isChanged: false,
+        };
+      }
+    });
+    return stateMap;
+  };
 }
 
 module.exports = new StateMap();

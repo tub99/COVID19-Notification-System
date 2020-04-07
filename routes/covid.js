@@ -10,7 +10,7 @@ const getLastSevenDayData = (timeSeriesData, today) => {
    timeData = timeSeriesData.slice(len - 6);
    const {deltaconfirmed,deltadeaths, deltarecovered } = today;
    const todayDate = new Date();
-   let todayDay = todayDate.getUTCDate();
+   let todayDay = todayDate.getDate();
    todayDay = (todayDay <=9) ? '0'+todayDay : todayDay;
    const todaysData =  {
     "dailyconfirmed": deltaconfirmed,
@@ -36,23 +36,23 @@ router.get("/", function (req, res, next) {
       const timeAnalysis = getLastSevenDayData(cases_time_series, stateList[0]);
       const stateWiseData = StateMap.getStateList(stateList);
       const apiResponse = { totalCases: stateWiseData, delta: {}, timeAnalysis, today: todaysData };
-      res.send(apiResponse);
-      //  MongoWrapper.storeDelta(stateWiseData,
-      //   (err, data) => {
+      //res.send(apiResponse);
+       MongoWrapper.storeDelta(stateWiseData,
+        (err, data) => {
 
-      //     if (err) res.send(response);
+          if (err) res.send(apiResponse);
 
-      //     else if (data){
-      //       const {isUpdateAt, deltaList} = data;
-      //       const filteredDeltaList = deltaList.filter(d => d.isChanged);
-      //       response.delta = {
-      //         isUpdateAt,
-      //         deltaList: filteredDeltaList
-      //       }
-      //       res.send(response);
-      //     }
-      //     else if(!err && !data) res.send(response);
-      //   });
+          else if (data){
+            const {updatedAt, deltaMap} = data;
+            const filteredDeltaList = StateMap.getFilteredDeltaList(deltaMap);
+            apiResponse.delta = {
+              updatedAt,
+              deltaList: filteredDeltaList
+            }
+            res.send(apiResponse);
+          }
+          else if(!err && !data) res.send(apiResponse);
+        });
     })
     .catch(function (error) {
       // handle error
