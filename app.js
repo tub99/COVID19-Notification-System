@@ -69,26 +69,34 @@ const getCurrentDT = () => {
 // store delta
 /**
  * Connect to MongoDB.
+ * 
  */
-// MongoWrapper.init((data) => {
-//   axios
-//     .get("https://api.covid19india.org/data.json")
-//     .then(function(response) {
-//       // handle success
-//       let stateList = response.data.statewise;
+
+const deltaStore = () =>{
+  axios
+    .get("https://api.covid19india.org/data.json")
+    .then(function(response) {
+      // handle success
+      let stateList = response.data.statewise;
 
       
-//       MongoWrapper.storeDelta(stateList,
-//         (err, data) => {
-//           if (err) console.log(err);
-//           if (data) console.log("Store Success", data);
-//           if(!err && !data) console.log('No updates happened');
-//         });
-//     })
-//     .catch(function(error) {
-//       // handle error
-//       console.log(error);
-//     });
-// });
+      MongoWrapper.storeDelta(stateList,
+        (err, data) => {
+          if (err) console.log(err);
+          if (data) console.log("Store Success", data);
+          if(!err && !data) console.log('No updates happened');
+        });
+    })
+    .catch(function(error) {
+      // handle error
+      console.log(error);
+    });
+} 
+MongoWrapper.init((data) => {
+  console.log('DB initialized', data);
+  setTimeout(() => {
+    deltaStore();
+  }, 10000);
+});
 
 module.exports = app;
