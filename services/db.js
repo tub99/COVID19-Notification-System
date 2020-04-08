@@ -64,8 +64,15 @@ function MongoWrapper() {
             { type: "delta" },
             { $set: toUpdateDoc },
             (err, res) => {
-              if (err) cb(err, null);
-              cb(null,toUpdateDoc);
+              if (err){
+                console.log('No Updates happened')
+                cb(err, null);
+              } 
+              else{
+                console.log('New Updates Happened', res);
+                cb(null,toUpdateDoc);
+              }
+             
             }
           );
         } else {

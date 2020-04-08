@@ -49,6 +49,7 @@ router.get("/", function (req, res, next) {
               updatedAt,
               deltaList: filteredDeltaList
             }
+            console.log('Delta Response', filteredDeltaList);
             res.send(apiResponse);
           }
           else if(!err && !data) res.send(apiResponse);
