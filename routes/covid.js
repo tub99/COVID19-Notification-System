@@ -7,7 +7,8 @@ const MongoWrapper = require("./../services/db");
 const getLastSevenDayData = (timeSeriesData, today) => {
   const len = timeSeriesData.length;
   let timeData = [];
-   timeData = timeSeriesData.slice(len - 6);
+   timeData = timeSeriesData.slice(len - 7);
+   return timeData;
    const {deltaconfirmed,deltadeaths, deltarecovered } = today;
    const todayDate = new Date();
    let todayDay = todayDate.getDate();
