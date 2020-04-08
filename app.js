@@ -96,7 +96,7 @@ MongoWrapper.init((data) => {
   console.log('DB initialized', data);
   setTimeout(() => {
     deltaStore();
-  }, 10000);
+  }, 20000);
 });
 
 module.exports = app;
