@@ -36,7 +36,8 @@ router.get("/", function (req, res, next) {
       const timeAnalysis = getLastSevenDayData(cases_time_series, stateList[0]);
       const stateWiseData = StateMap.getStateList(stateList);
       const apiResponse = { totalCases: stateWiseData, delta: {}, timeAnalysis, today: todaysData };
-      //res.send(apiResponse);
+      res.send(apiResponse);
+      return;
        MongoWrapper.storeDelta(stateWiseData,
         (err, data) => {
 
