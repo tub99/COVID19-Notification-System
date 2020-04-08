@@ -92,11 +92,11 @@ const deltaStore = () =>{
       console.log(error);
     });
 } 
-// MongoWrapper.init((data) => {
-//   console.log('DB initialized', data);
-//   setTimeout(() => {
-//     deltaStore();
-//   }, 20000);
-// });
+MongoWrapper.init((data) => {
+  console.log('DB initialized', data);
+  // setTimeout(() => {
+  //   deltaStore();
+  // }, 20000);
+});
 
 module.exports = app;
