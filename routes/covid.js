@@ -8,19 +8,22 @@ const getLastSevenDayData = (timeSeriesData, today) => {
   const len = timeSeriesData.length;
   let timeData = [];
    timeData = timeSeriesData.slice(len - 7);
-   return timeData;
    const {deltaconfirmed,deltadeaths, deltarecovered } = today;
    const todayDate = new Date();
    let todayDay = todayDate.getDate();
    todayDay = (todayDay <=9) ? '0'+todayDay : todayDay;
-   const todaysData =  {
-    "dailyconfirmed": deltaconfirmed,
-    "dailydeceased": deltadeaths,
-    "dailyrecovered": deltarecovered,
-    "date": todayDay+' '+ todayDate.toLocaleString('default', { month: 'long' })
-  };
-  timeData.push(todaysData);
-  return timeData;
+   const todayLegend = todayDay+' '+ todayDate.toLocaleString('default', { month: 'long' });
+   if(timeData[6].date.trim() !== todayLegend.trim()){
+    const todaysData =  {
+      "dailyconfirmed": deltaconfirmed,
+      "dailydeceased": deltadeaths,
+      "dailyrecovered": deltarecovered,
+      "date": todayLegend
+    };
+    timeData.push(todaysData);
+   }
+   return timeData;
+  
 };
 /* GET users listing. */
 router.get("/", function (req, res, next) {
