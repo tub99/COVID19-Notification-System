@@ -38,6 +38,7 @@ router.get("/", function (req, res, next) {
       const todaysData = StateMap.getTodayData(stateList);
       const { cases_time_series } = response.data;
       const timeAnalysis = getLastSevenDayData(cases_time_series, stateList[0]);
+      console.log('Time Data', timeAnalysis);
       const stateWiseData = StateMap.getStateList(stateList);
       const apiResponse = { totalCases: stateWiseData, delta: {}, timeAnalysis, today: todaysData };
       res.send(apiResponse);
